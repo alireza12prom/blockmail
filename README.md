@@ -138,14 +138,6 @@ npm run app:start
 
 Ensure `packages/app/.env` uses `VITE_RPC_URL=http://127.0.0.1:8545` and `VITE_WS_URL=ws://127.0.0.1:8545`. The deploy job prints the contract address; if it differs from your default, set `VITE_CONTRACT_ADDRESS` in `.env` to match.
 
-Stop the stack:
-
-```bash
-docker compose down
-```
-
-Or use npm scripts: `npm run docker:up`, `npm run docker:down`, `npm run docker:logs`.
-
 #### Building the client app in Docker
 
 You can build the Electron app (Linux `.deb`, `.rpm`, etc.) inside Docker for reproducible or CI builds:
