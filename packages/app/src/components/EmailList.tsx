@@ -10,6 +10,7 @@ interface EmailListProps {
   emailService: EmailService;
   onEmailClick: (email: Email) => void;
   newSentEmail?: Email | null;
+  onOpenCompose?: () => void;
 }
 
 export function EmailList({
@@ -17,6 +18,7 @@ export function EmailList({
   emailService,
   onEmailClick,
   newSentEmail,
+  onOpenCompose,
 }: EmailListProps) {
   const {
     emails,
@@ -40,6 +42,19 @@ export function EmailList({
           Inbox
         </h2>
         <div className="flex items-center gap-2">
+          {onOpenCompose && (
+            <button
+              type="button"
+              onClick={onOpenCompose}
+              className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-primary transition-colors"
+              title="New message"
+              aria-label="New message"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            </button>
+          )}
           <button
             onClick={refresh}
             disabled={isRefreshing}
@@ -55,9 +70,6 @@ export function EmailList({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
           </button>
-          <span className="bg-linear-to-br from-primary to-accent text-white px-3 py-1 rounded-full text-xs font-semibold">
-            {emails.length}
-          </span>
         </div>
       </div>
 
@@ -147,10 +159,11 @@ function EmailItem({ email, onClick }: EmailItemProps) {
         <span className="text-xs text-slate-500">At: {formatTime(email.timestamp)}</span>
       </div>
 
-      {email.direction !== 'sent' && (
-        <div className="text-sm text-slate-400 font-medium mb-1">{email.subject}</div>
+      {email.direction === 'sent' ? (
+        <div className="text-sm text-slate-400 font-medium mb-1">Encrypted</div>
+      ) : (
+        <div className="text-xs text-slate-500 truncate">{email.subject}</div>
       )}
-      <div className="text-xs text-slate-500 truncate">{email.body}</div>
     </div>
   );
 }

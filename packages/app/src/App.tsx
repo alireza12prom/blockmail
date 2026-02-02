@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 import {
   Header,
   EmailList,
-  ComposeForm,
+  ComposeModal,
   ConnectModal,
   CreateWalletModal,
   ImportWalletModal,
@@ -36,6 +36,7 @@ function App() {
   const [showConnectModal, setShowConnectModal] = useState(false);
   const [showCreateWalletModal, setShowCreateWalletModal] = useState(false);
   const [showImportWalletModal, setShowImportWalletModal] = useState(false);
+  const [showComposeModal, setShowComposeModal] = useState(false);
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
   const [replyTo, setReplyTo] = useState('');
   const [newSentEmail, setNewSentEmail] = useState<Email | null>(null);
@@ -46,10 +47,11 @@ function App() {
     markAsRead(email.id);
   };
 
-  // Handle reply
+  // Handle reply: set recipient and open compose modal
   const handleReply = (address: string) => {
     setReplyTo(address);
     setSelectedEmail(null);
+    setShowComposeModal(true);
   };
 
   const handleUseWallet = async (wallet: ethers.Wallet | ethers.HDNodeWallet) => {
@@ -90,8 +92,15 @@ function App() {
               emailService={emailService!}
               onEmailClick={handleEmailClick}
               newSentEmail={newSentEmail}
+              onOpenCompose={() => setShowComposeModal(true)}
             />
-            <ComposeForm
+
+            <ComposeModal
+              isOpen={showComposeModal}
+              onClose={() => {
+                setShowComposeModal(false);
+                setReplyTo('');
+              }}
               isConnected={isConnected}
               userAddress={userAddress}
               emailService={emailService!}

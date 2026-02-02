@@ -11,6 +11,8 @@ interface ComposeFormProps {
   onError: (message: string) => void;
   onSuccess: (message: string) => void;
   initialRecipient?: string;
+  /** When true, the form does not render its own "Compose" header (e.g. when inside a modal). */
+  hideHeader?: boolean;
 }
 
 export function ComposeForm({
@@ -21,6 +23,7 @@ export function ComposeForm({
   onError,
   onSuccess,
   initialRecipient = '',
+  hideHeader = false,
 }: ComposeFormProps) {
   const [recipient, setRecipient] = useState(initialRecipient);
   const [subject, setSubject] = useState('');
@@ -67,13 +70,15 @@ export function ComposeForm({
   }, [initialRecipient, recipient]);
 
   return (
-    <section className="w-[420px] shrink-0 bg-dark-card rounded-2xl border border-white/10 shadow-xl flex flex-col">
-      <div className="px-6 py-4 border-b border-white/10 bg-white/2">
-        <h2 className="text-base font-semibold text-slate-100 flex items-center gap-2">
-          <span className="w-1 h-5 bg-linear-to-b from-primary to-accent rounded-full" />
-          Compose
-        </h2>
-      </div>
+    <section className={`${hideHeader ? '' : 'w-[420px] shrink-0 bg-dark-card rounded-2xl border border-white/10 shadow-xl'} flex flex-col`}>
+      {!hideHeader && (
+        <div className="px-6 py-4 border-b border-white/10 bg-white/2">
+          <h2 className="text-base font-semibold text-slate-100 flex items-center gap-2">
+            <span className="w-1 h-5 bg-linear-to-b from-primary to-accent rounded-full" />
+            Compose
+          </h2>
+        </div>
+      )}
 
       <form className="p-6 flex flex-col gap-5 flex-1" onSubmit={handleSend}>
         <div className="flex flex-col gap-2">
