@@ -27,6 +27,14 @@ Messages are end-to-end encrypted, stored on IPFS, and metadata is recorded on t
 
 ---
 
+## Screenshots
+
+![Inbox](./screenshots/inbox.png)
+
+![New Email](./screenshots/new_email.png)
+
+---
+
 ## Quick Start
 
 ### Step 1: Install dependencies
@@ -81,7 +89,7 @@ npm run contracts:deploy:local
 
 The script will print something like:
 
-```
+```bash
 BlockMail deployed to: 0x... chainId: 31337
 KeyRegistry deployed to: 0x... chainId: 31337
 ```
