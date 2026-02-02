@@ -39,7 +39,7 @@ export function EmailList({
       <div className="px-6 py-4 border-b border-white/10 bg-white/2 flex justify-between items-center">
         <h2 className="text-base font-semibold text-slate-100 flex items-center gap-2">
           <span className="w-1 h-5 bg-linear-to-b from-primary to-accent rounded-full" />
-          Inbox
+          Inbox ({emails.length})
         </h2>
         <div className="flex items-center gap-2">
           {onOpenCompose && (
