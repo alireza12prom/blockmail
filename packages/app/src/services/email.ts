@@ -82,7 +82,7 @@ export class EmailService {
   }
 
 
-  private async getOne(address: string, params: GetOneParams): Promise<Email> {
+  async getOne(address: string, params: GetOneParams): Promise<Email> {
     const payload = await ipfs.get(params.cid);
     if (!payload) throw new Error('Email not found');
 

@@ -6,6 +6,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Email } from '../types';
 import { EmailService } from '../services';
+import { useWatchContractEvent } from 'wagmi';
+import { CONTRACT_ABI } from '../config/constants';
 
 const POLL_INTERVAL_MS = 30 * 1000;
 
@@ -89,6 +91,26 @@ export function useEmails({
       if (pollInterval) clearInterval(pollInterval);
     };
   }, [userAddress, load]);
+
+  useWatchContractEvent({
+    address: import.meta.env.VITE_CONTRACT_ADDRESS as `0x${string}`,
+    abi: CONTRACT_ABI,
+    eventName: 'Message',
+    onLogs(logs) {
+      logs.forEach(async (log) => {
+        const {cid, to} = log.args as any;
+        if (to != userAddress) return;
+        console.log('New message received: ', log.args);
+
+        const email = await emailService.getOne(
+          userAddress, 
+          { cid: cid, direction: 'received' }
+        );
+
+        addEmail(email);
+      })
+    },
+  })
 
   return {
     emails,
