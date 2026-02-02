@@ -4,6 +4,8 @@ interface HeaderProps {
   isConnected: boolean;
   userAddress: string;
   networkName: string;
+  /** Current session avatar URL (from public folder). */
+  avatar?: string | null;
   onConnect: () => void;
   onDisconnect: () => void;
 }
@@ -12,6 +14,7 @@ export function Header({
   isConnected,
   userAddress,
   networkName,
+  avatar,
   onConnect,
   onDisconnect
 }: HeaderProps) {
@@ -19,10 +22,7 @@ export function Header({
     <header className="sticky top-0 z-50 bg-dark-card/80 backdrop-blur-xl border-b border-white/10 px-6 py-4">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-linear-to-br from-primary to-accent rounded-xl flex items-center justify-center text-xl shadow-lg shadow-primary/25">
-            ✉
-          </div>
-          <h1 className="text-2xl font-bold text-gradient">BlockMail</h1>
+          <h1 className="text-2xl font-bold">BlockMail</h1>
         </div>
 
         <div className="flex items-center gap-3">
@@ -36,7 +36,15 @@ export function Header({
               {/* Connected Status */}
               <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-full border border-white/10">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 glow-success animate-pulse" />
+                  {avatar ? (
+                    <img
+                      src={avatar}
+                      alt=""
+                      className="w-8 h-8 rounded-full object-cover ring-2 ring-emerald-500/30"
+                    />
+                  ) : (
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 glow-success animate-pulse" />
+                  )}
                   <span className="address">{shortenAddress(userAddress)}</span>
                 </div>
                 <button

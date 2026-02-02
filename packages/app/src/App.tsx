@@ -24,6 +24,7 @@ function App() {
     isReconnecting,
     userAddress,
     networkName,
+    avatar,
     cachedWallets,
     connectWithWallet,
     reconnectCachedWallet,
@@ -65,6 +66,7 @@ function App() {
         isConnected={isConnected}
         userAddress={userAddress}
         networkName={networkName}
+        avatar={avatar}
         onConnect={() => setShowConnectModal(true)}
         onDisconnect={disconnect}
       />

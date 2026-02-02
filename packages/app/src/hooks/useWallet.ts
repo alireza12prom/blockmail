@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { ethers } from 'ethers';
 import { Email, Session } from '../types';
+import { pickRandomAvatar } from '../config/avatars';
 import { CONTRACT_ABI, CONTRACT_ADDRESS, KEY_REGISTRY_ABI, KEY_REGISTRY_ADDRESS, RPC_URL } from '../config/constants';
 import { EmailService, KeyRegistryService , storage} from '../services';
 
@@ -28,7 +29,7 @@ function getCachedSessionsList(): Session[] {
   } catch {
     return [];
   }
-}
+} 
 
 function writeKeypairFromSession(address: string, session: Session): void {
   try {
@@ -61,8 +62,10 @@ interface UseWalletReturn {
   userAddress: string;
   networkName: string;
   emails: Email[];
-  /** Up to 3 latest cached wallet addresses (for Connect modal). */
-  cachedWallets: { address: string }[];
+  /** Current session avatar URL (from public folder). */
+  avatar: string | null;
+  /** Up to 3 latest cached wallet addresses + avatar (for Connect modal). */
+  cachedWallets: { address: string; avatar: string | null }[];
   connectWithWallet: (wallet: SignerLike) => Promise<void>;
   /** Reconnect using a cached wallet by address. */
   reconnectCachedWallet: (address: string) => Promise<void>;
@@ -84,9 +87,10 @@ export function useWallet(
   const [isReconnecting, setIsReconnecting] = useState(false);
   const [keyRegistryService, setKeyRegistryService] = useState<KeyRegistryService | null>(null);
   const [emailService, setEmailService] = useState<EmailService | null>(null);
-  const [cachedWallets, setCachedWallets] = useState<{ address: string }[]>(() => {
+  const [avatar, setAvatar] = useState<string | null>(null);
+  const [cachedWallets, setCachedWallets] = useState<{ address: string; avatar: string | null }[]>(() => {
     const list = getCachedSessionsList();
-    return list.map((s) => ({ address: s.wallet.address })).slice(0, MAX_CACHED_SESSIONS);
+    return list.map((s) => ({ address: s.wallet.address, avatar: s.avatar ?? null })).slice(0, MAX_CACHED_SESSIONS);
   });
   const hasRestoredRef = useRef(false);
 
@@ -128,16 +132,19 @@ export function useWallet(
           const keypairRaw = storage.get('keypair', address);
           if (keypairRaw) {
             const { pk, sk } = JSON.parse(keypairRaw) as { pk: number[]; sk: number[] };
+            let list = getCachedSessionsList();
+            const existing = list.find((s) => s.wallet.address.toLowerCase() === address.toLowerCase());
             const session: Session = {
               wallet: { address, pk: wallet.privateKey },
               keypair: { pk: JSON.stringify(pk), sk: JSON.stringify(sk) },
+              avatar: existing?.avatar ?? pickRandomAvatar(),
             };
-            let list = getCachedSessionsList();
             list = list.filter((s) => s.wallet.address.toLowerCase() !== address.toLowerCase());
             list.unshift(session);
             list = list.slice(0, MAX_CACHED_SESSIONS);
             storage.set('sessions', 'list', JSON.stringify(list));
-            setCachedWallets(list.map((s) => ({ address: s.wallet.address })));
+            setCachedWallets(list.map((s) => ({ address: s.wallet.address, avatar: s.avatar ?? null })));
+            setAvatar(session.avatar ?? null);
           }
           storage.del('disconnected', 'key');
         } catch {
@@ -201,6 +208,7 @@ export function useWallet(
     setUserAddress('');
     setNetworkName('');
     setEmails([]);
+    setAvatar(null);
   }, [contract]);
 
   // Add email
@@ -216,6 +224,7 @@ export function useWallet(
     userAddress,
     networkName,
     emails,
+    avatar,
     cachedWallets,
     connectWithWallet,
     reconnectCachedWallet,

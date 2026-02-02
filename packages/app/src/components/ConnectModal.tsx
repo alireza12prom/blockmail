@@ -3,8 +3,8 @@ import { shortenAddress } from '../utils/helpers';
 interface ConnectModalProps {
   isOpen: boolean;
   onClose: () => void;
-  /** Up to 3 latest connected wallet addresses */
-  cachedWallets: { address: string }[];
+  /** Up to 3 latest connected wallet addresses + avatar */
+  cachedWallets: { address: string; avatar: string | null }[];
   onReconnectCached: (address: string) => void;
   onOpenCreateWallet: () => void;
   onOpenImportWallet: () => void;
@@ -45,7 +45,7 @@ export function ConnectModal({
                 Recent wallets
               </span>
               <div className="space-y-2">
-                {cachedWallets.map(({ address }) => (
+                {cachedWallets.map(({ address, avatar }) => (
                   <button
                     key={address}
                     type="button"
@@ -53,9 +53,17 @@ export function ConnectModal({
                       onReconnectCached(address);
                       onClose();
                     }}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary/15 hover:bg-primary/25 border border-primary/30 hover:border-primary/50 rounded-xl transition-all text-slate-100 font-medium text-sm"
+                    className="w-full flex items-center gap-3 px-4 py-3 bg-primary/15 hover:bg-primary/25 border border-primary/30 hover:border-primary/50 rounded-xl transition-all text-slate-100 font-medium text-sm"
                   >
-                    <span className="text-base">↻</span>
+                    {avatar ? (
+                      <img
+                        src={avatar}
+                        alt=""
+                        className="w-8 h-8 rounded-full object-cover ring-2 ring-primary/30 shrink-0"
+                      />
+                    ) : (
+                      <span className="w-8 h-8 rounded-full bg-primary/30 flex items-center justify-center text-base shrink-0">↻</span>
+                    )}
                     {shortenAddress(address)}
                   </button>
                 ))}
