@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { ethers } from 'ethers';
 import { Email } from '../types';
 import { shortenAddress, formatTime } from '../utils/helpers';
 import { useEmails } from '../hooks/useEmails';
