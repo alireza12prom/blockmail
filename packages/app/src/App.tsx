@@ -62,7 +62,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-dark-primary bg-pattern">
+    <div className="h-screen flex flex-col bg-dark-primary bg-pattern overflow-hidden">
       <Header
         isConnected={isConnected}
         userAddress={userAddress}
@@ -71,9 +71,9 @@ function App() {
         onDisconnect={disconnect}
       />
 
-      <main className="max-w-7xl mx-auto p-6 flex gap-6">
+      <main className="max-w-7xl mx-auto p-6 flex gap-6 flex-1 min-h-0 overflow-hidden w-full">
         {isReconnecting ? (
-          <div className="flex-1 flex items-center justify-center py-20">
+          <div className="flex-1 min-h-0 flex items-center justify-center py-20">
             <div className="text-center">
               <div className="w-16 h-16 mb-6 mx-auto relative">
                 <div className="absolute inset-0 border-4 border-primary/20 rounded-full" />

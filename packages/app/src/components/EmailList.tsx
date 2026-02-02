@@ -35,7 +35,7 @@ export function EmailList({
   }, [newSentEmail, addEmail]);
 
   return (
-    <section className="flex-1 bg-dark-card rounded-2xl border border-white/10 shadow-xl overflow-hidden flex flex-col">
+    <section className="flex-1 min-h-0 bg-dark-card rounded-2xl border border-white/10 shadow-xl overflow-hidden flex flex-col">
       <div className="px-6 py-4 border-b border-white/10 bg-white/2 flex justify-between items-center">
         <h2 className="text-base font-semibold text-slate-100 flex items-center gap-2">
           <span className="w-1 h-5 bg-linear-to-b from-primary to-accent rounded-full" />
@@ -73,7 +73,7 @@ export function EmailList({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-thin">
+      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin">
         {isLoading ? (
           <LoadingState />
         ) : emails.length === 0 ? (
