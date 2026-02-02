@@ -29,19 +29,25 @@ A decentralized email system built on Ethereum blockchain with IPFS storage. Sen
 ```
 blockmail/
 ├── packages/
-│   ├── app/              # Electron desktop application
+│   ├── app/                    # Electron desktop application
 │   │   ├── src/
-│   │   │   ├── components/   # React components
-│   │   │   ├── hooks/        # Custom React hooks
-│   │   │   ├── config/       # Configuration & constants
-│   │   │   └── utils/        # Helper utilities
-│   │   └── ...
-│   └── contracts/        # Solidity smart contracts
-│       ├── contracts/        # Solidity source files
-│       ├── ignition/         # Deployment modules
-│       ├── scripts/          # Deployment scripts
-│       └── test/             # Contract tests
-├── package.json          # Root workspace config
+│   │   │   ├── components/     # React UI (EmailList, ComposeModal, ConnectModal, …)
+│   │   │   ├── config/         # Constants & contract config
+│   │   │   ├── hooks/          # useWallet, useEmails, useToast
+│   │   │   ├── services/       # email, ipfsService, keyRegistry, storage
+│   │   │   ├── utils/          # Helpers
+│   │   │   ├── App.tsx
+│   │   │   ├── main.ts         # Electron main process
+│   │   │   ├── preload.ts      # Preload / IPC
+│   │   │   └── renderer.tsx    # React entry
+│   │   ├── index.html
+│   │   └── vite.*.config.mts  # Vite configs (main, preload, renderer)
+│   └── contracts/              # Solidity smart contracts
+│       ├── contracts/         # BlockMail.sol, KeyRegistry.sol
+│       ├── ignition/          # Hardhat Ignition deployment modules
+│       ├── scripts/           # deploy.ts
+│       └── test/              # Contract tests
+├── package.json               # Root workspace scripts
 └── README.md
 ```
 
