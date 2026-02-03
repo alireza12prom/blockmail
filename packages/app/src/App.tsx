@@ -33,6 +33,7 @@ function App() {
     cachedWallets,
     connectWithWallet,
     reconnectCachedWallet,
+    removeCachedWallet,
     disconnect,
     addEmail,
   } = useWallet(showToast);
@@ -131,6 +132,7 @@ function App() {
               await reconnectCachedWallet(address);
               setShowConnectModal(false);
             }}
+            onDeleteCached={removeCachedWallet}
             onOpenCreateWallet={() => {
               setShowConnectModal(false);
               setShowCreateWalletModal(true);

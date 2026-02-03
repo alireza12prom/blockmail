@@ -25,6 +25,17 @@ export class SessionService {
     ) ?? null;
   }
 
+  remove(address: string): void {
+    const data = this.load().filter(
+      ({ wallet }) => wallet.address.toLowerCase() !== address.toLowerCase()
+    );
+    this.storage.set('sessions', 'list', JSON.stringify(data));
+    const cur = this.current;
+    if (cur && cur.wallet.address.toLowerCase() === address.toLowerCase()) {
+      this.current = null;
+    }
+  }
+
   load(): Array<Session> {
     const raw = this.storage.get('sessions', 'list') ?? '[]';
     return JSON.parse(raw) as Session[];

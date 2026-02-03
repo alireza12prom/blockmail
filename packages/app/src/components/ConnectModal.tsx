@@ -6,6 +6,7 @@ interface ConnectModalProps {
   /** Up to 3 latest connected wallet addresses + avatar */
   cachedWallets: { address: string; avatar: string | null }[];
   onReconnectCached: (address: string) => void;
+  onDeleteCached: (address: string) => void;
   onOpenCreateWallet: () => void;
   onOpenImportWallet: () => void;
 }
@@ -15,6 +16,7 @@ export function ConnectModal({
   onClose,
   cachedWallets,
   onReconnectCached,
+  onDeleteCached,
   onOpenCreateWallet,
   onOpenImportWallet,
 }: ConnectModalProps) {
@@ -46,26 +48,44 @@ export function ConnectModal({
               </span>
               <div className="space-y-2">
                 {cachedWallets.map(({ address, avatar }) => (
-                  <button
+                  <div
                     key={address}
-                    type="button"
-                    onClick={() => {
-                      onReconnectCached(address);
-                      onClose();
-                    }}
-                    className="w-full flex items-center gap-3 px-4 py-3 bg-primary/15 hover:bg-primary/25 border border-primary/30 hover:border-primary/50 rounded-xl transition-all text-slate-100 font-medium text-sm"
+                    className="w-full flex items-center gap-2 px-4 py-3 bg-primary/15 hover:bg-primary/25 border border-primary/30 hover:border-primary/50 rounded-xl transition-all"
                   >
-                    {avatar ? (
-                      <img
-                        src={avatar}
-                        alt=""
-                        className="w-8 h-8 rounded-full object-cover ring-2 ring-primary/30 shrink-0"
-                      />
-                    ) : (
-                      <span className="w-8 h-8 rounded-full bg-primary/30 flex items-center justify-center text-base shrink-0">↻</span>
-                    )}
-                    {shortenAddress(address)}
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onReconnectCached(address);
+                        onClose();
+                      }}
+                      className="flex-1 flex items-center gap-3 text-left text-slate-100 font-medium text-sm min-w-0"
+                    >
+                      {avatar ? (
+                        <img
+                          src={avatar}
+                          alt=""
+                          className="w-8 h-8 rounded-full object-cover ring-2 ring-primary/30 shrink-0"
+                        />
+                      ) : (
+                        <span className="w-8 h-8 rounded-full bg-primary/30 flex items-center justify-center text-base shrink-0">↻</span>
+                      )}
+                      {shortenAddress(address)}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteCached(address);
+                      }}
+                      className="shrink-0 p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                      title="Remove wallet"
+                      aria-label="Remove wallet"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>
