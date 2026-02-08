@@ -33,6 +33,8 @@ interface UseWalletReturn {
   connectWithWallet: (wallet: SignerLike) => Promise<void>;
   /** Reconnect using a cached wallet by address. */
   reconnectCachedWallet: (address: string) => Promise<void>;
+  /** Remove a cached wallet (session) by address. */
+  removeCachedWallet: (address: string) => void;
   disconnect: () => void;
   addEmail: (email: Email) => void;
   emailService: EmailService | undefined;
@@ -193,6 +195,15 @@ export function useWallet(
     setEmails(prev => [email, ...prev]);
   }, []);
 
+  const removeCachedWallet = useCallback((address: string) => {
+    sessionService.remove(address);
+
+    const sessions = sessionService.load();
+    setCachedWallets(sessions.map((s) => (
+      { address: s.wallet.address, avatar: s.avatar ?? null })
+    ));
+  }, [])
+
   return {
     isConnected,
     isReconnecting,
@@ -205,6 +216,7 @@ export function useWallet(
     cachedWallets,
     connectWithWallet,
     reconnectCachedWallet,
+    removeCachedWallet,
     disconnect,
     addEmail,
     emailService,
