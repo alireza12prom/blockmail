@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { ethers } from 'ethers';
 
 /** Wallet or HDNodeWallet (both have address, privateKey, connect). */
@@ -7,7 +7,7 @@ type SignerLike = ethers.Wallet | ethers.HDNodeWallet;
 interface CreateWalletModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUseWallet: (wallet: SignerLike) => void;
+  onUseWallet: (wallet: SignerLike) => Promise<void>;
 }
 
 export function CreateWalletModal({
@@ -19,9 +19,19 @@ export function CreateWalletModal({
   const [revealPrivateKey, setRevealPrivateKey] = useState(false);
   const [copied, setCopied] = useState<'mnemonic' | 'address' | 'privateKey' | null>(null);
 
+  // Reset wallet state when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setWallet(null);
+      setRevealPrivateKey(false);
+      setCopied(null);
+    }
+  }, [isOpen]);
+
   const handleGenerate = useCallback(() => {
     // HDNodeWallet gives us mnemonic.phrase; we use it as signer (has address, privateKey, connect)
     const w = ethers.HDNodeWallet.createRandom();
+    console.log('Generated new wallet:', w.address);
     setWallet(w);
     setRevealPrivateKey(false);
     setCopied(null);
@@ -37,10 +47,18 @@ export function CreateWalletModal({
     }
   }, []);
 
-  const handleUseWallet = useCallback(() => {
+  const handleUseWallet = useCallback(async () => {
     if (wallet) {
-      onUseWallet(wallet);
-      onClose();
+      console.log('Using wallet with address:', wallet.address);
+      try {
+        await onUseWallet(wallet);
+        onClose();
+      } catch (error) {
+        console.error('Failed to use wallet:', error);
+        // Don't close modal on error - let user see what happened
+      }
+    } else {
+      console.error('No wallet to use!');
     }
   }, [wallet, onUseWallet, onClose]);
 

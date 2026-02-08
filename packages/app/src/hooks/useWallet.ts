@@ -60,9 +60,11 @@ export function useWallet(
   const connectWithWallet = useCallback(
     async (wallet: SignerLike) => {
       try {
+        console.log('connectWithWallet called with wallet address:', wallet.address);
         const provider = new ethers.JsonRpcProvider(RPC_URL);
         const signer = wallet.connect(provider);
         const address = await signer.getAddress();
+        console.log('Connected wallet address:', address);
 
         // Fund new wallet on local Hardhat so it can pay for setPubKey and other txs
         await fundAddressIfHardhat(provider, address);
@@ -84,25 +86,53 @@ export function useWallet(
         
         try {
           let session = sessionService.find(address);
+          console.log('Session lookup for address:', address, 'found:', !!session);
           if (!session) {
-            const { pk, sk } = await keyRegSvc.init(address);
+            // New wallet - create session
+            console.log('Creating new session for wallet:', address, 'privateKey length:', wallet.privateKey.length);
+            try {
+              const { pk, sk } = await keyRegSvc.init(address);
 
-            session = sessionService.save({
-              wallet: { address, pk: wallet.privateKey },
-              keypair: { pk, sk },
-            });
+              session = sessionService.save({
+                wallet: { address, pk: wallet.privateKey },
+                keypair: { pk, sk },
+              });
+              console.log('New session created for wallet:', address, 'session address:', session.wallet.address);
+            } catch (initError) {
+              console.error('Failed to initialize key registry:', initError);
+              // Even if init fails, save the wallet so user can use it
+              // Generate a temporary keypair for the session
+              const tempPk = '0x' + '0'.repeat(64);
+              const tempSk = '0x' + '0'.repeat(64);
+              session = sessionService.save({
+                wallet: { address, pk: wallet.privateKey },
+                keypair: { pk: tempPk, sk: tempSk },
+              });
+              console.log('Session saved with temporary keypair for wallet:', address);
+              showToast('Wallet connected, but key registry initialization failed. Some features may not work.', 'error');
+            }
+          } else {
+            // Existing session found - update it with current wallet's private key to ensure it's current
+            console.log('Existing session found for wallet:', address);
+            // Update the session's private key in case it changed (shouldn't happen, but be safe)
+            session.wallet.pk = wallet.privateKey;
+            // Update the session in storage
+            sessionService.update(session);
           }
           
           sessionService.current = session;
+          console.log('Current session set to:', address);
 
           const sessions = sessionService.load();
           setCachedWallets(sessions.map((s) => (
             { address: s.wallet.address, avatar: s.avatar ?? null })
           ));
+          console.log('Cached wallets updated, count:', sessions.length);
 
           setAvatar(session.avatar ?? null);
-        } catch {
-          // ignore storage errors
+        } catch (storageError) {
+          console.error('Failed to save session:', storageError);
+          showToast('Wallet connected, but failed to save session. Changes may not persist.', 'error');
         }
       } catch (err) {
         console.error('Connection failed:', err);

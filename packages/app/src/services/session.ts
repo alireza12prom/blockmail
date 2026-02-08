@@ -31,6 +31,7 @@ export class SessionService {
   }
 
   save(params: SaveParams): Session {
+    console.log('SessionService.save called with address:', params.wallet.address);
     const session: Session = {
       wallet: params.wallet,
       keypair: params.keypair,
@@ -38,19 +39,38 @@ export class SessionService {
     }
 
     const data = this.load();
+    console.log('Current cached sessions count:', data.length);
     if (data.length >= MAX_CACHED_SESSIONS) {
-      data.pop();
+      const removed = data.pop();
+      console.log('Removed oldest session:', removed?.wallet.address);
     }
 
     const isWalletExists = data.find(
-      ({wallet:w}) => w.address.toLocaleLowerCase() == params.wallet.address.toLocaleLowerCase()
+      ({wallet:w}) => w.address.toLowerCase() === params.wallet.address.toLowerCase()
     );
-    if (isWalletExists) return isWalletExists;
+    if (isWalletExists) {
+      console.log('Wallet already exists in cache, returning existing session:', isWalletExists.wallet.address);
+      return isWalletExists;
+    }
 
+    console.log('Saving new session for address:', params.wallet.address);
     const raw = JSON.stringify([session, ...data]);
     this.storage.set('sessions', 'list', raw);
+    console.log('Session saved successfully. New session address:', session.wallet.address);
 
     return session;
+  }
+
+  update(session: Session): void {
+    const data = this.load();
+    const index = data.findIndex(
+      (s) => s.wallet.address.toLowerCase() === session.wallet.address.toLowerCase()
+    );
+    if (index !== -1) {
+      data[index] = session;
+      const raw = JSON.stringify(data);
+      this.storage.set('sessions', 'list', raw);
+    }
   }
 }
 

@@ -59,10 +59,16 @@ function App() {
   };
 
   const handleUseWallet = async (wallet: ethers.Wallet | ethers.HDNodeWallet) => {
-    await connectWithWallet(wallet);
-    setShowConnectModal(false);
-    setShowCreateWalletModal(false);
-    setShowImportWalletModal(false);
+    try {
+      await connectWithWallet(wallet);
+      setShowConnectModal(false);
+      setShowCreateWalletModal(false);
+      setShowImportWalletModal(false);
+    } catch (error) {
+      console.error('Error in handleUseWallet:', error);
+      // Error is already handled in connectWithWallet, but don't close modals on error
+      throw error; // Re-throw so CreateWalletModal can handle it
+    }
   };
 
   return (
